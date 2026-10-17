@@ -235,7 +235,104 @@
       background: #c80711;
     }
 
-    /* Social Bar Footer (Muncul Full Lebar di Bawah Setelah Video Berputar) */
+    /* Recommended Videos Section */
+    .recommended-section {
+      padding: 16px;
+      border-top: 1px solid #282a36;
+      margin-top: 10px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    .video-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .video-card {
+      display: flex;
+      gap: 12px;
+      background: #16181f;
+      border-radius: 10px;
+      overflow: hidden;
+      text-decoration: none;
+      color: #ffffff;
+      border: 1px solid #282a36;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .video-card:active {
+      transform: scale(0.98);
+      background: #1f222b;
+    }
+
+    .card-thumb {
+      position: relative;
+      width: 120px;
+      height: 75px;
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+    }
+
+    .card-badge {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: #e50914;
+      color: white;
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+
+    .card-info {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-views {
+      font-size: 11px;
+      color: #a0a0a0;
+    }
+
+    /* Native Banner Container */
+    .native-banner-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 60px;
+      background: #16181f;
+      border-radius: 10px;
+      border: 1px solid #282a36;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    /* Social Bar Footer */
     .social-bar-footer {
       position: fixed;
       bottom: 0;
@@ -254,7 +351,6 @@
       justify-content: center;
     }
 
-    /* Tampil setelah video berputar */
     .social-bar-footer.active {
       transform: translateY(0);
     }
@@ -331,17 +427,49 @@
         📥 Download Video (HD)
       </button>
     </div>
+
+    <!-- REKOMENDASI VIDEO & NATIVE BANNER -->
+    <section class="recommended-section">
+      <h2 class="section-title">Video Pilihan Lainnya</h2>
+      
+      <div class="video-list">
+        <!-- Pilihan Video 1 (Thumbnail Diperbarui) -->
+        <a href="https://playvidei.github.io/Newvide/" class="video-card">
+          <div class="card-thumb" style="background-image: url('https://i.ibb.co.com/N6k2KDVb/Screenshot-2026-1015-191118.png');">
+            <span class="card-badge">HD</span>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">Video Pilihan Trending #1 Terbaru</h3>
+            <span class="card-views">👁️ 620K Penonton</span>
+          </div>
+        </a>
+
+        <!-- Pilihan Video 2 (Thumbnail Diperbarui) -->
+        <a href="https://playvidei.github.io/VideTerbaru/" class="video-card">
+          <div class="card-thumb" style="background-image: url('https://i.ibb.co.com/NkKzch6/Screenshot-2026-1015-185445.png');">
+            <span class="card-badge">HD</span>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">Video Pilihan Viral Terpopuler #2</h3>
+            <span class="card-views">👁️ 910K Penonton</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Iklan Native Banner -->
+      <div class="native-banner-container">
+        <script async="async" data-cfasync="false" src="https://thewilddetail.com/4ac27ece24247e6abb30fb78ea2f725e/invoke.js"></script>
+        <div id="container-4ac27ece24247e6abb30fb78ea2f725e"></div>
+      </div>
+    </section>
   </main>
 
   <!-- SOCIAL BAR FOOTER -->
   <div id="socialBarFooter" class="social-bar-footer">
-    <div id="socialBarContainer" class="social-bar-container">
-      <!-- Skrip Sosial Bar akan dimuat otomatis di sini saat video berputar -->
-    </div>
+    <div id="socialBarContainer" class="social-bar-container"></div>
   </div>
 
   <script>
-    // Konfigurasi Link Skrip Iklan Anda
     const CONFIG = {
       popunder1Script: 'https://thewilddetail.com/58/5d/14/585d14a1088579ccf27a4840dfa44967.js',
       popunder2Script: 'https://thewilddetail.com/d8/8e/b3/d88eb3d0170ef3478f8f44203ace8da9.js',
@@ -349,7 +477,6 @@
       smartlinkUrl: 'https://thewilddetail.com/jcmqzgpi?key=24b55e3636d607271fdc76c2cd116ebe'
     };
 
-    // DOM Elements
     const previewOverlay = document.getElementById('previewOverlay');
     const playOverlay = document.getElementById('playOverlay');
     const myVideo = document.getElementById('myVideo');
@@ -358,10 +485,10 @@
     const socialBarContainer = document.getElementById('socialBarContainer');
     const zoomBtn = document.getElementById('zoomBtn');
     const playerWrapper = document.querySelector('.player-wrapper');
+    const videoCards = document.querySelectorAll('.video-card');
 
     let socialBarLoaded = false;
 
-    // Fungsi untuk menyuntikkan skrip popunder secara dinamis
     function injectScript(url) {
       if (url) {
         const script = document.createElement('script');
@@ -371,41 +498,29 @@
       }
     }
 
-    // Event 1: Klik pada Preview (Popunder 1 terpanggil)
     previewOverlay.addEventListener('click', function() {
       injectScript(CONFIG.popunder1Script);
-
-      // Sembunyikan Preview, tampilkan Tombol Play
       previewOverlay.style.display = 'none';
       playOverlay.style.display = 'flex';
     });
 
-    // Event 2: Klik pada Tombol Play (Popunder 2 terpanggil & Video Berputar)
     playOverlay.addEventListener('click', function() {
       injectScript(CONFIG.popunder2Script);
-
-      // Sembunyikan Overlay Play & Jalankan Video
       playOverlay.style.display = 'none';
       myVideo.play();
     });
 
-    // Event 3: Klik pada Tombol Download (Membuka Smartlink Iklan)
     downloadBtn.addEventListener('click', function() {
       if (CONFIG.smartlinkUrl) {
         window.open(CONFIG.smartlinkUrl, '_blank');
       }
     });
 
-    // Event 4: Klik pada Tombol Zoom/Fullscreen (Membuka Smartlink & Fullscreen)
     zoomBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      
-      // Membuka Smartlink Iklan
       if (CONFIG.smartlinkUrl) {
         window.open(CONFIG.smartlinkUrl, '_blank');
       }
-
-      // Melakukan Fullscreen pada Pemutar Video
       if (!document.fullscreenElement) {
         if (playerWrapper.requestFullscreen) {
           playerWrapper.requestFullscreen();
@@ -419,11 +534,17 @@
       }
     });
 
-    // Event 5: Munculkan Social Bar Full Layar Footer saat Video Berputar
+    // Event untuk Kartu Video Pilihan (Membuka Smartlink Iklan saat diklik)
+    videoCards.forEach(card => {
+      card.addEventListener('click', function(e) {
+        if (CONFIG.smartlinkUrl) {
+          window.open(CONFIG.smartlinkUrl, '_blank');
+        }
+      });
+    });
+
     myVideo.addEventListener('play', function() {
       socialBarFooter.classList.add('active');
-
-      // Muat skrip social bar jika belum dimuat
       if (!socialBarLoaded) {
         const sbScript = document.createElement('script');
         sbScript.src = CONFIG.socialBarScript;
