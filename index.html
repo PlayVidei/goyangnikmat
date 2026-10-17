@@ -1,243 +1,437 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Eksklusif Media Streaming</title>
-    
-    <!-- Meta Open Graph -->
-    <meta property="og:title" content="Portal Berita & Hiburan Terkini">
-    <meta property="og:description" content="Tonton tayangan video lengkap kualitas HD di sini.">
-    <meta property="og:image" content="https://i.ibb.co.com/nqDfHjbp/1790926636480.jpg">
-    <meta property="og:type" content="website">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mobile Video Player dengan Iklan Popunder, Social Bar & Smartlink</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            width: 100%; height: 100%; background-color: #000;
-            font-family: 'Poppins', sans-serif; overflow: hidden; color: #fff;
-        }
+    body {
+      background-color: #0d0e12;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-x: hidden;
+    }
 
-        /* 1. TIRAI GATE (Popunder 1) */
-        #prePlayerGate {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.9)), url('https://i.ibb.co.com/nqDfHjbp/1790926636480.jpg') center/cover no-repeat;
-            z-index: 2000; display: flex; justify-content: center; align-items: center;
-        }
-        .gate-btn {
-            background: #ef4444; color: #fff; border: none; padding: 18px 40px;
-            font-size: 1.5rem; font-weight: 700; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.6); animation: pulse 1.5s infinite;
-            text-transform: uppercase; letter-spacing: 2px;
-        }
+    /* Header Mobile */
+    .app-header {
+      padding: 14px 16px;
+      background: #16181f;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #282a36;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); }
-        }
+    .app-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #e50914;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        /* 2. KONTEN VIDEO & TOMBOL PLAY SEGITIGA (Popunder 2) */
-        .video-container {
-            position: relative; width: 100%; height: 100vh;
-            display: flex; justify-content: center; align-items: center; background: #000;
-        }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        
-        #playTrigger {
-            position: absolute; z-index: 5; background: rgba(239, 68, 68, 0.9);
-            border: none; width: 90px; height: 90px; border-radius: 50%;
-            display: none; justify-content: center; align-items: center;
-            cursor: pointer; box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
-        }
-        #playTrigger svg { width: 45px; height: 45px; fill: white; margin-left: 6px; }
+    .badge-hd {
+      background: #e50914;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
 
-        /* 3. MODAL POPUP */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px);
-            z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px;
-        }
-        .modal-card {
-            background: #1e293b; width: 100%; max-width: 450px; padding: 40px 30px;
-            border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        .modal-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 15px; color: #f8fafc; }
-        .modal-desc { font-size: 1.1rem; color: #cbd5e1; margin-bottom: 30px; line-height: 1.6; }
-        .modal-btn {
-            display: block; width: 100%; padding: 18px; background: #3b82f6; color: white;
-            border-radius: 16px; font-weight: 700; font-size: 1.2rem; border: none; cursor: pointer;
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5); text-transform: uppercase;
-        }
+    /* Main Container / Video Layout */
+    .content-container {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 90px; /* Space for Social Bar footer */
+    }
 
-        /* 4. AREA SOCIAL BAR (Disatukan & Dibuat Berurutan ke Bawah) */
-        #socialBarContainer { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            z-index: 998; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        #socialBarTop, #socialBarMid { 
-            width: 100%; 
-            text-align: center; 
-        }
-        #socialBarMid {
-            pointer-events: none;
-        }
-    </style>
+    /* Player Wrapper (16:9 Aspect Ratio) */
+    .player-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+      background-color: #000;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+
+    /* Element HTML5 Video */
+    .video-element {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    /* Zoom Button Style */
+    .zoom-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 25;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .zoom-btn:active {
+      transform: scale(0.9);
+      background: rgba(229, 9, 20, 0.8);
+    }
+
+    /* Layer Preview / Thumbnail (Popunder 1) */
+    .preview-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+      cursor: pointer;
+    }
+
+    .preview-overlay::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .preview-btn {
+      position: relative;
+      z-index: 2;
+      background: rgba(229, 9, 20, 0.9);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 4px 15px rgba(229, 9, 20, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: pulse 2s infinite;
+    }
+
+    /* Layer Play Button (Popunder 2) */
+    .play-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: none; /* Tampil setelah Popunder 1 diklik */
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      cursor: pointer;
+    }
+
+    .play-btn-circle {
+      width: 70px;
+      height: 70px;
+      background: #e50914;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 25px rgba(229, 9, 20, 0.8);
+      transition: transform 0.2s ease;
+    }
+
+    .play-btn-circle:active {
+      transform: scale(0.9);
+    }
+
+    .play-icon {
+      width: 0;
+      height: 0;
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      border-left: 22px solid white;
+      margin-left: 5px;
+    }
+
+    /* Video Info Section */
+    .video-info {
+      padding: 16px;
+    }
+
+    .video-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .video-stats {
+      font-size: 12px;
+      color: #a0a0a0;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    /* Download Button Style */
+    .download-btn {
+      width: 100%;
+      background: #e50914;
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .download-btn:active {
+      transform: scale(0.98);
+      background: #c80711;
+    }
+
+    /* Social Bar Footer (Muncul Full Lebar di Bawah Setelah Video Berputar) */
+    .social-bar-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #16181f;
+      border-top: 2px solid #e50914;
+      padding: 12px;
+      z-index: 100;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 -5px 25px rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Tampil setelah video berputar */
+    .social-bar-footer.active {
+      transform: translateY(0);
+    }
+
+    .social-bar-container {
+      width: 100%;
+      max-width: 500px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- STAGE 1: Gate Overlay -->
-    <div id="prePlayerGate">
-        <button class="gate-btn" id="gateBtn">PLAY VIDEO</button>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-title">
+      <span>STREAMPLAY</span>
+      <span class="badge-hd">ULTRA HD</span>
     </div>
+  </header>
 
-    <!-- AREA SOCIAL BAR (Membungkus 2 bar agar sejajar ke bawah) -->
-    <div id="socialBarContainer">
-        <div id="socialBarTop"></div>
-        <div id="socialBarMid"></div>
-    </div>
+  <!-- Content Container -->
+  <main class="content-container">
+    <div class="player-wrapper">
+      <!-- TOMBOL ZOOM / FULLSCREEN DENGAN IKLAN SMARTLINK -->
+      <button id="zoomBtn" class="zoom-btn" title="Zoom / Perbesar Layar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+        </svg>
+      </button>
 
-    <!-- STAGE 2: Pemutar Video -->
-    <div class="video-container">
-        <video id="secureVideo" poster="https://i.ibb.co.com/nqDfHjbp/1790926636480.jpg" playsinline webkit-playsinline>
-            Browser Anda tidak mendukung pemutar video.
-        </video>
-        
-        <button id="playTrigger" aria-label="Play Video">
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-    </div>
+      <!-- Video Element -->
+      <video id="myVideo" class="video-element" controls preload="metadata">
+        <source src="https://cdn.videy.co/eiC4Ar9E1.mp4" type="video/mp4">
+        Browser Anda tidak mendukung pemutar video ini.
+      </video>
 
-    <!-- STAGE 3: Popup Verifikasi Umur -->
-    <div id="ageModal" class="modal-overlay">
-        <div class="modal-card">
-            <h3 class="modal-title" style="color: #ef4444;">Peringatan 18+</h3>
-            <p class="modal-desc">Konten ini khusus untuk orang dewasa. Harap verifikasi usia Anda terlebih dahulu.</p>
-            <button id="ageConfirmBtn" class="modal-btn" style="background: #ef4444; box-shadow: 0 8px 20px rgba(239,68,68,0.5);">SAYA BERUSIA 18+</button>
+      <!-- POPUNDER 1: Triggered on Preview Image -->
+      <div id="previewOverlay" class="preview-overlay" style="background-image: url('https://i.ibb.co/RT3rMndB/images.jpg');">
+        <div class="preview-btn">
+          <span>KETUK UNTUK MEMBUKA PEMUTAR</span>
         </div>
-    </div>
+      </div>
 
-    <!-- STAGE 4: Popup Verifikasi Human -->
-    <div id="humanModal" class="modal-overlay">
-        <div class="modal-card">
-            <h3 class="modal-title" style="color: #3b82f6;">Verifikasi Keamanan</h3>
-            <p class="modal-desc">Sistem mendeteksi akses. Buktikan bahwa Anda adalah manusia untuk melanjutkan.</p>
-            <button id="humanConfirmBtn" class="modal-btn">VERIFIKASI SEKARANG</button>
+      <!-- POPUNDER 2: Triggered on Play Button -->
+      <div id="playOverlay" class="play-overlay">
+        <div class="play-btn-circle">
+          <div class="play-icon"></div>
         </div>
+      </div>
     </div>
 
-    <!-- STAGE 5: Popup Sukses -->
-    <div id="successModal" class="modal-overlay">
-        <div class="modal-card">
-            <h3 class="modal-title" style="color: #22c55e;">BERHASIL!</h3>
-            <p class="modal-desc" style="font-size: 1.2rem; font-weight: 600;">TERIMAKASIH TELAH MELEWATI IKLAN, SEKARANG ANDA BISA MENIKMATI VIDEONYA.</p>
-            <button id="startWatchingBtn" class="modal-btn" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34,197,94,0.5);">LANJUT</button>
-        </div>
+    <!-- Video Info -->
+    <div class="video-info">
+      <h1 class="video-title">Video Streaming Eksklusif</h1>
+      <div class="video-stats">
+        <span>👁️ 845K Penonton</span>
+        <span>⏱️ HD Quality</span>
+        <span>⭐ 4.9/5.0</span>
+      </div>
+
+      <!-- Tombol Download dengan Iklan Smartlink -->
+      <button id="downloadBtn" class="download-btn">
+        📥 Download Video (HD)
+      </button>
     </div>
+  </main>
 
-    <script>
-        const smartlink1URL = "https://thewilddetail.com/z02a1bxd?key=f48d1b3a91d0b1fd3db51c3c384a044b";
+  <!-- SOCIAL BAR FOOTER -->
+  <div id="socialBarFooter" class="social-bar-footer">
+    <div id="socialBarContainer" class="social-bar-container">
+      <!-- Skrip Sosial Bar akan dimuat otomatis di sini saat video berputar -->
+    </div>
+  </div>
 
-        function injectAdScript(targetElementId, scriptSrc) {
-            let script = document.createElement('script');
-            script.src = scriptSrc;
-            if (targetElementId) {
-                document.getElementById(targetElementId).appendChild(script);
-            } else {
-                document.body.appendChild(script);
-            }
+  <script>
+    // Konfigurasi Link Skrip Iklan Anda
+    const CONFIG = {
+      popunder1Script: 'https://thewilddetail.com/58/5d/14/585d14a1088579ccf27a4840dfa44967.js',
+      popunder2Script: 'https://thewilddetail.com/d8/8e/b3/d88eb3d0170ef3478f8f44203ace8da9.js',
+      socialBarScript: 'https://thewilddetail.com/c4/4b/2c/c44b2ccc7687c2c208901dc7f9633fa2.js',
+      smartlinkUrl: 'https://thewilddetail.com/jcmqzgpi?key=24b55e3636d607271fdc76c2cd116ebe'
+    };
+
+    // DOM Elements
+    const previewOverlay = document.getElementById('previewOverlay');
+    const playOverlay = document.getElementById('playOverlay');
+    const myVideo = document.getElementById('myVideo');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const socialBarFooter = document.getElementById('socialBarFooter');
+    const socialBarContainer = document.getElementById('socialBarContainer');
+    const zoomBtn = document.getElementById('zoomBtn');
+    const playerWrapper = document.querySelector('.player-wrapper');
+
+    let socialBarLoaded = false;
+
+    // Fungsi untuk menyuntikkan skrip popunder secara dinamis
+    function injectScript(url) {
+      if (url) {
+        const script = document.createElement('script');
+        script.src = url;
+        script.async = true;
+        document.body.appendChild(script);
+      }
+    }
+
+    // Event 1: Klik pada Preview (Popunder 1 terpanggil)
+    previewOverlay.addEventListener('click', function() {
+      injectScript(CONFIG.popunder1Script);
+
+      // Sembunyikan Preview, tampilkan Tombol Play
+      previewOverlay.style.display = 'none';
+      playOverlay.style.display = 'flex';
+    });
+
+    // Event 2: Klik pada Tombol Play (Popunder 2 terpanggil & Video Berputar)
+    playOverlay.addEventListener('click', function() {
+      injectScript(CONFIG.popunder2Script);
+
+      // Sembunyikan Overlay Play & Jalankan Video
+      playOverlay.style.display = 'none';
+      myVideo.play();
+    });
+
+    // Event 3: Klik pada Tombol Download (Membuka Smartlink Iklan)
+    downloadBtn.addEventListener('click', function() {
+      if (CONFIG.smartlinkUrl) {
+        window.open(CONFIG.smartlinkUrl, '_blank');
+      }
+    });
+
+    // Event 4: Klik pada Tombol Zoom/Fullscreen (Membuka Smartlink & Fullscreen)
+    zoomBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      
+      // Membuka Smartlink Iklan
+      if (CONFIG.smartlinkUrl) {
+        window.open(CONFIG.smartlinkUrl, '_blank');
+      }
+
+      // Melakukan Fullscreen pada Pemutar Video
+      if (!document.fullscreenElement) {
+        if (playerWrapper.requestFullscreen) {
+          playerWrapper.requestFullscreen();
+        } else if (playerWrapper.webkitRequestFullscreen) {
+          playerWrapper.webkitRequestFullscreen();
         }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    });
 
-        (function() {
-            const userAgent = navigator.userAgent.toLowerCase();
-            const botKeywords = ['bot', 'crawler', 'spider', 'facebookexternalhit', 'whatsapp', 'telegrambot'];
-            let isBot = botKeywords.some(keyword => userAgent.includes(keyword)) || navigator.webdriver;
+    // Event 5: Munculkan Social Bar Full Layar Footer saat Video Berputar
+    myVideo.addEventListener('play', function() {
+      socialBarFooter.classList.add('active');
 
-            if (!isBot) {
-                injectAdScript(null, "https://thewilddetail.com/d8/8e/b3/d88eb3d0170ef3478f8f44203ace8da9.js");
-            }
-        })();
-
-        const videoElement = document.getElementById('secureVideo');
-        const gateBtn = document.getElementById('gateBtn');
-        const gateOverlay = document.getElementById('prePlayerGate');
-        const playTrigger = document.getElementById('playTrigger');
-        
-        const ageModal = document.getElementById('ageModal');
-        const humanModal = document.getElementById('humanModal');
-        const successModal = document.getElementById('successModal');
-        
-        let hasPassedAge = false;
-        let hasPassedHuman = false;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            videoElement.src = "https://cdn.videy.co/yZ8ofZGE1.mp4";
-            videoElement.load();
-        });
-
-        gateBtn.addEventListener('click', () => {
-            gateOverlay.style.display = 'none';
-            playTrigger.style.display = 'flex'; 
-            
-            setTimeout(() => {
-                injectAdScript(null, "https://thewilddetail.com/58/5d/14/585d14a1088579ccf27a4840dfa44967.js");
-            }, 1000);
-        });
-
-        playTrigger.addEventListener('click', () => {
-            playTrigger.style.display = 'none';
-            videoElement.controls = true;
-            videoElement.play();
-        });
-
-        videoElement.addEventListener('timeupdate', () => {
-            if (videoElement.currentTime >= 3 && !hasPassedAge) {
-                videoElement.pause();
-                videoElement.controls = false; 
-                ageModal.style.display = 'flex';
-                hasPassedAge = true; 
-            }
-            
-            if (videoElement.currentTime >= 6 && hasPassedAge && !hasPassedHuman) {
-                videoElement.pause();
-                videoElement.controls = false;
-                humanModal.style.display = 'flex';
-                hasPassedHuman = true;
-                
-                injectAdScript(null, "https://thewilddetail.com/c4/4b/2c/c44b2ccc7687c2c208901dc7f9633fa2.js");
-            }
-        });
-
-        document.getElementById('ageConfirmBtn').addEventListener('click', () => {
-            window.open(smartlink1URL, '_blank'); 
-            ageModal.style.display = 'none';
-            videoElement.play(); 
-        });
-
-        document.getElementById('humanConfirmBtn').addEventListener('click', () => {
-            humanModal.style.display = 'none';
-            successModal.style.display = 'flex';
-        });
-
-        document.getElementById('startWatchingBtn').addEventListener('click', () => {
-            successModal.style.display = 'none';
-            videoElement.controls = true; 
-            videoElement.play(); 
-
-            setTimeout(() => {
-                injectAdScript("socialBarTop", "https://thewilddetail.com/0b/28/3b/0b283b590e4a16de38f299a6ffe16906.js");
-                injectAdScript("socialBarMid", "https://thewilddetail.com/c4/4b/2c/c44b2ccc7687c2c208901dc7f9633fa2.js");
-            }, 1000);
-        });
-
-    </script>
+      // Muat skrip social bar jika belum dimuat
+      if (!socialBarLoaded) {
+        const sbScript = document.createElement('script');
+        sbScript.src = CONFIG.socialBarScript;
+        sbScript.async = true;
+        socialBarContainer.appendChild(sbScript);
+        socialBarLoaded = true;
+      }
+    });
+  </script>
 </body>
 </html>
